@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">GameAppAndroid</string>
+    <string name="LoginCaption">Log In</string>
+    <string name="RegisterCaption">Register</string>
+    <string name="PasswordCaption">Password</string>
+    <string name="EmailCaption">Email</string>
+</resources>
