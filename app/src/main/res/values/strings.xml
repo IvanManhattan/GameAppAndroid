@@ -3,5 +3,8 @@
     <string name="LoginCaption">Log In</string>
     <string name="RegisterCaption">Register</string>
     <string name="PasswordCaption">Password</string>
+    <string name="NameCaption">Name</string>
     <string name="EmailCaption">Email</string>
+    <string name="ButtonToolBarProfileName">Profile</string>
+    <string name="ButtonRedirectRegister">Register</string>
 </resources>
