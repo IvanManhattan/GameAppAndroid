@@ -37,6 +37,13 @@ class MainActivity : AppCompatActivity() {
         recyclerView.layoutManager = LinearLayoutManager(this)
 
         // Загружаем данные
+        gameAdapter = GameAdapter(mutableListOf()) { game ->
+            val intent = Intent(this, GameDetailActivity::class.java)
+            intent.putExtra("id", game.id)  // Исправил ключ на "id"
+            startActivity(intent)
+        }
+        recyclerView.adapter = gameAdapter  // Устанавливаем пустой адаптер
+
         fetchGames()
     }
 
@@ -64,27 +71,25 @@ class MainActivity : AppCompatActivity() {
     private fun fetchGames() {
         db.collection("games").get()
             .addOnSuccessListener { result ->
-                // Очистка списка перед добавлением новых данных
                 gamesList.clear()
-
-                // Преобразование документов в объекты Game
                 for (document in result) {
                     val game = document.toObject(Game::class.java)
                     gamesList.add(game)
                 }
 
-                // Создание и установка адаптера
-                gameAdapter = GameAdapter(gamesList) { game ->
-                    // Обработка клика по игре
-                    val intent = Intent(this, GameDetailActivity::class.java)
-                    intent.putExtra("gameId", game.id)  // Передаем ID игры
-                    startActivity(intent)
+                // Проверяем, существует ли уже адаптер
+                if (::gameAdapter.isInitialized) {
+                    gameAdapter.updateGames(gamesList)  // Обновляем данные в адаптере
+                } else {
+                    gameAdapter = GameAdapter(gamesList) { game ->
+                        val intent = Intent(this, GameDetailActivity::class.java)
+                        intent.putExtra("id", game.id)
+                        startActivity(intent)
+                    }
+                    recyclerView.adapter = gameAdapter  // Устанавливаем адаптер только один раз
                 }
+            }
 
-                recyclerView.adapter = gameAdapter // Устанавливаем адаптер в RecyclerView
-            }
-            .addOnFailureListener { e ->
-                Log.e("Firebase", "Ошибка загрузки данных", e)
-            }
+
     }
 }
