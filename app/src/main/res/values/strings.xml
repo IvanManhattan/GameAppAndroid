@@ -7,4 +7,6 @@
     <string name="EmailCaption">Email</string>
     <string name="ButtonToolBarProfileName">Profile</string>
     <string name="ButtonRedirectRegister">Register</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>
