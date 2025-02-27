@@ -1,31 +1,61 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/main"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ProfileActivity">
+    android:orientation="vertical"
+    android:padding="16dp">
 
+    <!-- Email пользователя -->
     <TextView
         android:id="@+id/textViewEmail"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="164dp"
-        android:text="TextView"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.498"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        android:text="Email: user@example.com"
+        android:textSize="18sp"
+        android:layout_marginBottom="16dp"
+        android:layout_marginTop="112dp"/>
 
-    <Button
-        android:id="@+id/profileButtonLogout"
+    <!-- Имя пользователя -->
+    <TextView
+        android:id="@+id/textViewName"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Log out"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textViewEmail"
-        app:layout_constraintVertical_bias="0.184" />
-</androidx.constraintlayout.widget.ConstraintLayout>
+        android:text="Name: John Doe"
+        android:textSize="18sp"
+        android:layout_marginBottom="16dp" />
+
+    <!-- Биография пользователя -->
+    <TextView
+        android:id="@+id/textViewBio"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Bio: This is a sample bio."
+        android:textSize="16sp"
+        android:layout_marginBottom="16dp" />
+
+    <!-- Список избранных игр -->
+    <TextView
+        android:id="@+id/textViewFavorites"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Favorites: Game 1, Game 2"
+        android:textSize="16sp"
+        android:layout_marginBottom="16dp" />
+
+    <!-- Кнопка редактирования профиля -->
+    <Button
+        android:id="@+id/buttonEditProfile"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Edit Profile"
+        android:textSize="16sp"
+        android:layout_marginBottom="16dp" />
+
+    <!-- Кнопка выхода -->
+    <Button
+        android:id="@+id/profileButtonLogout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Logout"
+        android:textSize="16sp" />
+</LinearLayout>

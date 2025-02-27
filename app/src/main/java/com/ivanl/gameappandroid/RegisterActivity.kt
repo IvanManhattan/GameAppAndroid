@@ -6,21 +6,21 @@ import android.view.MenuItem
 import android.widget.Button
 import android.widget.EditText
 import android.widget.Toast
-import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FirebaseFirestore
 
 class RegisterActivity : AppCompatActivity() {
 
     private lateinit var auth: FirebaseAuth
+    private lateinit var db: FirebaseFirestore
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_register)
 
         auth = FirebaseAuth.getInstance()
+        db = FirebaseFirestore.getInstance()
 
         val emailField = findViewById<EditText>(R.id.editTextREmailInput)
         val passwordField = findViewById<EditText>(R.id.editTextRPasswordInput)
@@ -36,8 +36,10 @@ class RegisterActivity : AppCompatActivity() {
                 auth.createUserWithEmailAndPassword(email, password)
                     .addOnCompleteListener { task ->
                         if (task.isSuccessful) {
-                            Toast.makeText(this, "Регистрация успешна", Toast.LENGTH_SHORT).show()
-                            finish()
+                            val user = auth.currentUser
+                            user?.let {
+                                createUserDocument(it.uid)
+                            }
                         } else {
                             Toast.makeText(this, "Ошибка: ${task.exception?.message}", Toast.LENGTH_LONG).show()
                         }
@@ -46,6 +48,24 @@ class RegisterActivity : AppCompatActivity() {
                 Toast.makeText(this, "Введите корректные данные", Toast.LENGTH_SHORT).show()
             }
         }
+    }
+
+    private fun createUserDocument(uid: String) {
+        val user = hashMapOf(
+            "name" to "",
+            "bio" to "",
+            "favorites" to emptyList<String>() // Пустой список избранных игр
+        )
+
+        db.collection("users").document(uid)
+            .set(user)
+            .addOnSuccessListener {
+                Toast.makeText(this, "Аккаунт создан!", Toast.LENGTH_SHORT).show()
+                finish()
+            }
+            .addOnFailureListener { e ->
+                Toast.makeText(this, "Ошибка сохранения: ${e.message}", Toast.LENGTH_LONG).show()
+            }
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -59,5 +79,4 @@ class RegisterActivity : AppCompatActivity() {
             else -> super.onOptionsItemSelected(item)
         }
     }
-
 }
