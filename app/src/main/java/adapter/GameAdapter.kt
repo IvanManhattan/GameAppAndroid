@@ -39,13 +39,12 @@ class GameAdapter(
             .load(game.imageUrl)
             .into(holder.gameImage)
 
+
         holder.itemView.setOnClickListener {
-            val context = it.context
-            val intent = Intent(context, GameDetailActivity::class.java)
-            intent.putExtra("id", game.id)  // Передаём gameId
-            context.startActivity(intent)
+            onClick(game)
         }
     }
+
 
 
     override fun getItemCount(): Int = games.size

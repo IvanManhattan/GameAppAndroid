@@ -58,7 +58,7 @@ class EditProfileActivity : AppCompatActivity() {
                     .update(updatedProfile)
                     .addOnSuccessListener {
                         Toast.makeText(this, "Profile updated", Toast.LENGTH_SHORT).show()
-                        finish() // Закрываем экран редактирования и возвращаемся на экран профиля
+                        finish()
                     }
                     .addOnFailureListener { e ->
                         Toast.makeText(this, "Error updating profile: ${e.message}", Toast.LENGTH_SHORT).show()

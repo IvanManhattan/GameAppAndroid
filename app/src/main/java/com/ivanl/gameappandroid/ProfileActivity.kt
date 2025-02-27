@@ -66,9 +66,8 @@ class ProfileActivity : AppCompatActivity() {
 
         userRef.get().addOnSuccessListener { document ->
             if (document.exists()) {
-
-                val name = document.getString("name")
-                val bio = document.getString("bio")
+                val name = document.getString("name") ?: "Без имени"
+                val bio = document.getString("bio") ?: "Нет описания"
                 val favorites = document.get("favorites") as? List<String> ?: emptyList()
 
                 val email = auth.currentUser?.email ?: "Unknown Email"
@@ -76,15 +75,40 @@ class ProfileActivity : AppCompatActivity() {
                 emailTextView.text = "Email: $email"
                 nameTextView.text = "Name: $name"
                 bioTextView.text = "Bio: $bio"
-                favoritesTextView.text = "Favorites: ${favorites.joinToString(", ")}"
+
+                if (favorites.isEmpty()) {
+                    favoritesTextView.text = "Favorites: Нет избранных игр"
+                } else {
+                    val gameNames = mutableListOf<String>()
+
+                    for (gameId in favorites) {
+                        db.collection("games").whereEqualTo("id", gameId).limit(1).get()
+                            .addOnSuccessListener { querySnapshot ->
+                                if (!querySnapshot.isEmpty) {
+                                    val gameDoc = querySnapshot.documents[0]
+                                    val gameName = gameDoc.getString("name") ?: "Неизвестная игра"
+                                    gameNames.add(gameName)
+                                } else {
+                                    gameNames.add("Неизвестная игра")
+                                }
+
+
+                                if (gameNames.size == favorites.size) {
+                                    favoritesTextView.text = "Favorites: ${gameNames.joinToString(", ")}"
+                                }
+                            }
+                    }
+                }
             }
         }
     }
 
+
+
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
-            android.R.id.home -> { // Обработка нажатия на стрелку "назад"
-                finish() // Просто закрываем активити, возвращаясь назад
+            android.R.id.home -> {
+                finish()
                 true
             }
             else -> super.onOptionsItemSelected(item)

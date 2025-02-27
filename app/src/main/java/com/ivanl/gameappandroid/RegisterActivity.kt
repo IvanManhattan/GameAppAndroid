@@ -54,7 +54,7 @@ class RegisterActivity : AppCompatActivity() {
         val user = hashMapOf(
             "name" to "",
             "bio" to "",
-            "favorites" to emptyList<String>() // Пустой список избранных игр
+            "favorites" to emptyList<String>()
         )
 
         db.collection("users").document(uid)

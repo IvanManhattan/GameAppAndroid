@@ -43,7 +43,7 @@ class MainActivity : AppCompatActivity() {
                     true
                 }
                 R.id.nav_favorites -> {
-                    Toast.makeText(this, "Избранное", Toast.LENGTH_SHORT).show()
+                    replaceFragment(FavoritesFragment())
                     true
                 }
                 else -> false
@@ -68,9 +68,9 @@ class MainActivity : AppCompatActivity() {
             R.id.profile -> {
                 val user = auth.currentUser
                 val intent = if (user != null) {
-                    Intent(this, ProfileActivity::class.java) // Если авторизован – открываем профиль
+                    Intent(this, ProfileActivity::class.java)
                 } else {
-                    Intent(this, LoginActivity::class.java) // Если нет – отправляем на логин
+                    Intent(this, LoginActivity::class.java)
                 }
                 startActivity(intent)
                 true
