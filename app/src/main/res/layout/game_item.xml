@@ -30,13 +30,18 @@
             android:paddingTop="8dp" />
 
         <TextView
-            android:id="@+id/gameDescription"
-            android:layout_width="match_parent"
+            android:id="@+id/gameReleaseDate"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:maxLines="2"
-            android:ellipsize="end"
             android:textSize="14sp"
-            android:paddingTop="4dp" />
+            android:textColor="@android:color/darker_gray"/>
+
+        <TextView
+            android:id="@+id/gameGenres"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="14sp"
+            android:textColor="@android:color/darker_gray"/>
 
     </LinearLayout>
 

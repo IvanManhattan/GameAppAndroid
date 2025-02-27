@@ -1,25 +1,30 @@
 package com.ivanl.gameappandroid
 
 import adapter.GameAdapter
-import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.*
+import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import androidx.appcompat.widget.SearchView
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.Query
 import model.Game
+import androidx.appcompat.widget.SearchView
 
 class SearchFragment : Fragment() {
 
     private lateinit var searchView: SearchView
-    private lateinit var recyclerView: RecyclerView
+    private lateinit var genreSpinner: Spinner
+    private lateinit var dateFilterButton: Button
+    private lateinit var gamesRecyclerView: RecyclerView
     private lateinit var gameAdapter: GameAdapter
     private lateinit var db: FirebaseFirestore
-    private var gamesList = mutableListOf<Game>()
+    private var selectedGenre: String? = null
+    private var selectedYear: String? = null
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -27,57 +32,95 @@ class SearchFragment : Fragment() {
     ): View {
         val view = inflater.inflate(R.layout.fragment_search, container, false)
 
-        db = FirebaseFirestore.getInstance()
         searchView = view.findViewById(R.id.searchView)
-        recyclerView = view.findViewById(R.id.gamesRecyclerView)
-        recyclerView.layoutManager = LinearLayoutManager(requireContext())
+        genreSpinner = view.findViewById(R.id.genreSpinner)
+        dateFilterButton = view.findViewById(R.id.dateFilterButton)
+        gamesRecyclerView = view.findViewById(R.id.gamesRecyclerView)
 
-        gameAdapter = GameAdapter(mutableListOf()) { game ->
-            val intent = Intent(requireContext(), GameDetailActivity::class.java)
-            intent.putExtra("id", game.id)
-            startActivity(intent)
+        db = FirebaseFirestore.getInstance()
+        gameAdapter = GameAdapter(mutableListOf()) {  }
+        gamesRecyclerView.layoutManager = LinearLayoutManager(requireContext())
+        gamesRecyclerView.adapter = gameAdapter
+
+        dateFilterButton.setOnClickListener {
+            showYearPicker()
         }
-        recyclerView.adapter = gameAdapter
 
-        fetchGames()
-
-        searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
-            override fun onQueryTextSubmit(query: String?): Boolean {
-                return false
-            }
-
-            override fun onQueryTextChange(newText: String?): Boolean {
-                filterGames(newText.orEmpty())
-                return true
-            }
-        })
+        setupGenreSpinner()
+        setupSearch()
 
         return view
     }
 
-    private fun fetchGames() {
-        db.collection("games").get()
-            .addOnSuccessListener { result ->
-                gamesList.clear()
-                for (document in result) {
-                    val game = document.toObject(Game::class.java)
-                    gamesList.add(game)
-                }
+    private fun showYearPicker() {
+        val years = (1995..2025).map { it.toString() }.toTypedArray()
+
+        AlertDialog.Builder(requireContext())
+            .setTitle("Choose year")
+            .setItems(years) { _, which ->
+                selectedYear = years[which]
+                dateFilterButton.text = "Year: $selectedYear"
+                filterGames()
             }
+            .setNegativeButton("Back", null)
+            .show()
     }
 
-    private fun filterGames(query: String) {
-        val filteredList = if (query.isEmpty()) {
-            emptyList()
-        } else {
-            gamesList.filter { it.name.contains(query, ignoreCase = true) }
-        }
+    private fun setupGenreSpinner() {
+        val genres = listOf("All genres", "Action", "RPG", "Strategy", "Shooter", "Adventure", "Family")
+        val adapter = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_item, genres)
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+        genreSpinner.adapter = adapter
 
-        if (filteredList.isEmpty()) {
-            recyclerView.visibility = View.GONE
-        } else {
-            recyclerView.visibility = View.VISIBLE
-            gameAdapter.updateGames(filteredList)
+        genreSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+            override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
+                selectedGenre = if (position == 0) null else genres[position]
+                filterGames()
+            }
+
+            override fun onNothingSelected(parent: AdapterView<*>?) {}
         }
     }
+
+    private fun setupSearch() {
+        searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
+            override fun onQueryTextSubmit(query: String?): Boolean {
+                filterGames()
+                return true
+            }
+
+            override fun onQueryTextChange(newText: String?): Boolean {
+                filterGames()
+                return true
+            }
+        })
+    }
+
+    private fun filterGames() {
+        val queryText = searchView.query.toString().trim()
+
+        var query: Query = db.collection("games")
+
+        if (!selectedGenre.isNullOrEmpty()) {
+            query = query.whereArrayContains("genres", selectedGenre!!)
+        }
+
+        if (!selectedYear.isNullOrEmpty()) {
+            query = query.whereEqualTo("releaseDate", selectedYear!!.toString())
+        }
+
+        query.get().addOnSuccessListener { documents ->
+            var filteredGames = documents.map { it.toObject(Game::class.java) }
+
+            if (queryText.isNotEmpty()) {
+                filteredGames = filteredGames.filter { it.name.contains(queryText, ignoreCase = true) }
+            }
+
+            gameAdapter.updateGames(filteredGames)
+            gamesRecyclerView.visibility = if (filteredGames.isEmpty()) View.GONE else View.VISIBLE
+        }
+    }
+
+
+
 }

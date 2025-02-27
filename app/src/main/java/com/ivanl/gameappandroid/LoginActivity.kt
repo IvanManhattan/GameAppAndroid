@@ -63,7 +63,7 @@ class LoginActivity : AppCompatActivity() {
         return when (item.itemId) {
             android.R.id.home -> {
                 val intent = Intent(this, MainActivity::class.java)
-                intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP // Убирает активити из стека
+                intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
                 startActivity(intent)
                 true
             }

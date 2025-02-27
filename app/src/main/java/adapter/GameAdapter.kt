@@ -20,7 +20,8 @@ class GameAdapter(
     class GameViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val gameImage: ImageView = itemView.findViewById(R.id.gameImage)
         val gameTitle: TextView = itemView.findViewById(R.id.gameTitle)
-        val gameDescription: TextView = itemView.findViewById(R.id.gameDescription)
+        val gameReleaseDate: TextView = itemView.findViewById(R.id.gameReleaseDate)
+        val gameGenres: TextView = itemView.findViewById(R.id.gameGenres)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): GameViewHolder {
@@ -31,13 +32,13 @@ class GameAdapter(
     override fun onBindViewHolder(holder: GameViewHolder, position: Int) {
         val game = games[position]
         holder.gameTitle.text = game.name
-        holder.gameDescription.text = game.description
+        holder.gameReleaseDate.text = "Дата выхода: ${game.releaseDate}"
+        holder.gameGenres.text = "Жанры: ${game.genres.joinToString(", ")}"
 
         Glide.with(holder.itemView.context)
             .load(game.imageUrl)
             .into(holder.gameImage)
 
-        // Открытие деталей игры по клику
         holder.itemView.setOnClickListener {
             val context = it.context
             val intent = Intent(context, GameDetailActivity::class.java)
@@ -49,13 +50,9 @@ class GameAdapter(
 
     override fun getItemCount(): Int = games.size
 
-    // Метод для обновления списка игр
     fun updateGames(newGames: List<Game>) {
         games.clear()
         games.addAll(newGames)
-        notifyDataSetChanged() // Обновляем RecyclerView
+        notifyDataSetChanged()
     }
-
-
-
 }

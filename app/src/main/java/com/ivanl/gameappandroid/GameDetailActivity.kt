@@ -9,10 +9,7 @@ import android.widget.Button
 import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
-import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
 import com.bumptech.glide.Glide
 import com.google.firebase.firestore.FirebaseFirestore
 import model.Game
@@ -22,6 +19,8 @@ class GameDetailActivity : AppCompatActivity() {
     private lateinit var gameImageView: ImageView
     private lateinit var gameTitleTextView: TextView
     private lateinit var gameDescriptionTextView: TextView
+    private lateinit var gameReleaseDateTextView: TextView
+    private lateinit var gameGenresTextView: TextView
     private lateinit var openSteamButton: Button
     private lateinit var db: FirebaseFirestore
 
@@ -31,46 +30,44 @@ class GameDetailActivity : AppCompatActivity() {
 
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
-        // Инициализация элементов UI
         gameImageView = findViewById(R.id.gameImageView)
         gameTitleTextView = findViewById(R.id.gameTitleTextView)
         gameDescriptionTextView = findViewById(R.id.gameDescriptionTextView)
+        gameReleaseDateTextView = findViewById(R.id.gameReleaseDateTextView)
+        gameGenresTextView = findViewById(R.id.gameGenresTextView)
         openSteamButton = findViewById(R.id.openSteamButton)
 
-        // Получаем gameId из Intent
         val gameId = intent.getStringExtra("id")
 
-        // Инициализация Firestore
         db = FirebaseFirestore.getInstance()
 
-        // Загружаем детали игры
         gameId?.let { loadGameDetails(gameId) }
-
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
             android.R.id.home -> {
-                finish() // Закрываем активность и возвращаемся назад
+                finish()
                 true
             }
             else -> super.onOptionsItemSelected(item)
         }
     }
 
-    // Метод для загрузки данных игры
     private fun loadGameDetails(gameId: String) {
         db.collection("games")
-            .whereEqualTo("id", gameId) // Ищем по полю "id"
-            .limit(1) // Нам нужен только один документ
+            .whereEqualTo("id", gameId)
+            .limit(1)
             .get()
             .addOnSuccessListener { documents ->
                 if (!documents.isEmpty) {
-                    val document = documents.documents[0] // Берём первый найденный документ
+                    val document = documents.documents[0]
                     val game = document.toObject(Game::class.java)
                     game?.let {
                         gameTitleTextView.text = it.name
                         gameDescriptionTextView.text = it.description
+                        gameReleaseDateTextView.text = "Дата выхода: ${it.releaseDate}"
+                        gameGenresTextView.text = "Жанры: ${it.genres.joinToString(", ")}"
 
                         Glide.with(this)
                             .load(it.imageUrl)
@@ -87,7 +84,7 @@ class GameDetailActivity : AppCompatActivity() {
                         }
                     }
                 } else {
-                    Log.e("GameDetail", "Игра с id=$gameId не найдена в базе!")
+                    Log.e("GameDetail", "Игра с id=$gameId не найдена!")
                     Toast.makeText(this, "Игра не найдена!", Toast.LENGTH_SHORT).show()
                 }
             }
@@ -96,6 +93,4 @@ class GameDetailActivity : AppCompatActivity() {
                 Toast.makeText(this, "Ошибка загрузки данных", Toast.LENGTH_SHORT).show()
             }
     }
-
-
 }

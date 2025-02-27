@@ -5,5 +5,8 @@ data class Game(
     val name: String = "",
     val imageUrl: String = "",
     val description: String = "",
-    val steamUrl: String = ""
+    val steamUrl: String = "",
+    val releaseDate: String = "",
+    val genres: List<String> = emptyList(),
+
 )
