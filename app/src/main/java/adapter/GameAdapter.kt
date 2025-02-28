@@ -36,14 +36,14 @@ class GameAdapter(
         holder.gameGenres.text = "Жанры: ${game.genres.joinToString(", ")}"
 
         Glide.with(holder.itemView.context)
-            .load(game.imageUrl)
+            .load(game.imageUrls.firstOrNull() ?: R.drawable.placeholder_image)
             .into(holder.gameImage)
-
 
         holder.itemView.setOnClickListener {
             onClick(game)
         }
     }
+
 
 
 

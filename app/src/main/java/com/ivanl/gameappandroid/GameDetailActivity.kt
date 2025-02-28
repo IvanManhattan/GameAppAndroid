@@ -1,5 +1,6 @@
 package com.ivanl.gameappandroid
 
+import adapter.GameImageSliderAdapter
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
@@ -11,6 +12,7 @@ import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.viewpager2.widget.ViewPager2
 import com.bumptech.glide.Glide
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
@@ -18,7 +20,7 @@ import model.Game
 
 class GameDetailActivity : AppCompatActivity() {
 
-    private lateinit var gameImageView: ImageView
+    private lateinit var gameImageSlider: ViewPager2
     private lateinit var gameTitleTextView: TextView
     private lateinit var gameDescriptionTextView: TextView
     private lateinit var gameReleaseDateTextView: TextView
@@ -33,7 +35,7 @@ class GameDetailActivity : AppCompatActivity() {
 
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
-        gameImageView = findViewById(R.id.gameImageView)
+        gameImageSlider = findViewById(R.id.gameImageSlider)
         gameTitleTextView = findViewById(R.id.gameTitleTextView)
         gameDescriptionTextView = findViewById(R.id.gameDescriptionTextView)
         gameReleaseDateTextView = findViewById(R.id.gameReleaseDateTextView)
@@ -49,10 +51,10 @@ class GameDetailActivity : AppCompatActivity() {
         if (user == null) {
             favoriteButton.visibility = View.GONE
         } else {
+            gameId?.let { updateFavoriteButton(it) }
+
             favoriteButton.setOnClickListener {
-                gameId?.let { gameId ->
-                    toggleFavorite(gameId)
-                }
+                gameId?.let { gameId -> toggleFavorite(gameId) }
             }
         }
 
@@ -70,22 +72,6 @@ class GameDetailActivity : AppCompatActivity() {
     }
 
     private fun loadGameDetails(gameId: String) {
-        val user = FirebaseAuth.getInstance().currentUser
-        if (user != null) {
-            val userRef = FirebaseFirestore.getInstance().collection("users").document(user.uid)
-
-            userRef.get().addOnSuccessListener { document ->
-                if (document.exists()) {
-                    val favorites = document.get("favorites") as? List<String> ?: emptyList()
-                    if (favorites.contains(gameId)) {
-                        favoriteButton.text = "Удалить из избранного"
-                    } else {
-                        favoriteButton.text = "Добавить в избранное"
-                    }
-                }
-            }
-        }
-
         db.collection("games")
             .whereEqualTo("id", gameId)
             .limit(1)
@@ -100,14 +86,14 @@ class GameDetailActivity : AppCompatActivity() {
                         gameReleaseDateTextView.text = "Дата выхода: ${it.releaseDate}"
                         gameGenresTextView.text = "Жанры: ${it.genres.joinToString(", ")}"
 
-                        Glide.with(this)
-                            .load(it.imageUrl)
-                            .placeholder(R.drawable.placeholder_image)
-                            .into(gameImageView)
+                        if (it.imageUrls.isNotEmpty()) {
+                            val adapter = GameImageSliderAdapter(it.imageUrls)
+                            gameImageSlider.adapter = adapter
+                        }
 
                         if (!it.steamUrl.isNullOrEmpty()) {
-                            openSteamButton.setOnClickListener { _ ->
-                                val intent = Intent(Intent.ACTION_VIEW, Uri.parse(it.steamUrl))
+                            openSteamButton.setOnClickListener {
+                                val intent = Intent(Intent.ACTION_VIEW, Uri.parse(game.steamUrl))
                                 startActivity(intent)
                             }
                         } else {
@@ -133,19 +119,42 @@ class GameDetailActivity : AppCompatActivity() {
             userRef.get().addOnSuccessListener { document ->
                 if (document.exists()) {
                     val favorites = document.get("favorites") as? MutableList<String> ?: mutableListOf()
-                    if (favorites.contains(gameId)) {
+                    val isFavorite = favorites.contains(gameId)
+
+                    if (isFavorite) {
                         favorites.remove(gameId)
-                        favoriteButton.text = "Добавить в избранное"
-                        Toast.makeText(this, "Удалено из избранного", Toast.LENGTH_SHORT).show()
                     } else {
                         favorites.add(gameId)
-                        favoriteButton.text = "Удалить из избранного"
-                        Toast.makeText(this, "Добавлено в избранное", Toast.LENGTH_SHORT).show()
                     }
-                    userRef.update("favorites", favorites)
+
+                    userRef.update("favorites", favorites).addOnSuccessListener {
+                        favoriteButton.text = if (isFavorite) "Добавить в избранное" else "Удалить из избранного"
+
+                        val message = if (isFavorite) "Удалено из избранного" else "Добавлено в избранное"
+                        Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
+                    }
                 }
             }
         }
     }
+
+
+    private fun updateFavoriteButton(gameId: String) {
+        val user = FirebaseAuth.getInstance().currentUser
+        if (user != null) {
+            val userRef = FirebaseFirestore.getInstance().collection("users").document(user.uid)
+
+            userRef.get().addOnSuccessListener { document ->
+                if (document.exists()) {
+                    val favorites = document.get("favorites") as? List<String> ?: emptyList()
+                    val isFavorite = favorites.contains(gameId)
+
+                    favoriteButton.text = if (isFavorite) "Удалить из избранного" else "Добавить в избранное"
+                }
+            }
+        }
+    }
+
+
 }
 
