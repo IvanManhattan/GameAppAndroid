@@ -5,7 +5,6 @@
     android:orientation="vertical"
     android:padding="16dp">
 
-    <!-- Поле для редактирования имени -->
     <EditText
         android:id="@+id/editTextName"
         android:layout_width="match_parent"
@@ -15,7 +14,6 @@
         android:layout_marginBottom="16dp"
         android:layout_marginTop="112dp"/>
 
-    <!-- Поле для редактирования биографии -->
     <EditText
         android:id="@+id/editTextBio"
         android:layout_width="match_parent"
@@ -24,16 +22,6 @@
         android:textSize="16sp"
         android:layout_marginBottom="16dp" />
 
-    <!-- Поле для редактирования избранных игр -->
-    <EditText
-        android:id="@+id/editTextFavorites"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:hint="Enter favorite games (comma separated)"
-        android:textSize="16sp"
-        android:layout_marginBottom="16dp" />
-
-    <!-- Кнопка сохранения изменений -->
     <Button
         android:id="@+id/buttonSave"
         android:layout_width="match_parent"
@@ -42,7 +30,6 @@
         android:textSize="16sp"
         android:layout_marginBottom="16dp" />
 
-    <!-- Кнопка отмены -->
     <Button
         android:id="@+id/buttonCancel"
         android:layout_width="match_parent"

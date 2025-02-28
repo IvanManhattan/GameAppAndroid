@@ -4,10 +4,7 @@ import android.os.Bundle
 import android.widget.Button
 import android.widget.EditText
 import android.widget.Toast
-import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 
@@ -17,7 +14,6 @@ class EditProfileActivity : AppCompatActivity() {
     private lateinit var db: FirebaseFirestore
     private lateinit var nameEditText: EditText
     private lateinit var bioEditText: EditText
-    private lateinit var favoritesEditText: EditText
     private lateinit var saveButton: Button
     private lateinit var cancelButton: Button
 
@@ -30,32 +26,27 @@ class EditProfileActivity : AppCompatActivity() {
 
         nameEditText = findViewById(R.id.editTextName)
         bioEditText = findViewById(R.id.editTextBio)
-        favoritesEditText = findViewById(R.id.editTextFavorites)
         saveButton = findViewById(R.id.buttonSave)
         cancelButton = findViewById(R.id.buttonCancel)
 
         val user = auth.currentUser
         user?.let {
-            // Загружаем текущие данные пользователя
             loadUserProfile(it.uid)
         }
 
-        // Кнопка сохранения изменений
         saveButton.setOnClickListener {
             val name = nameEditText.text.toString().trim()
             val bio = bioEditText.text.toString().trim()
-            val favorites = favoritesEditText.text.toString().split(",").map { it.trim() }
 
             val updatedProfile = hashMapOf(
                 "name" to name,
-                "bio" to bio,
-                "favorites" to favorites
+                "bio" to bio
             )
 
             val uid = auth.currentUser?.uid
             if (uid != null) {
                 db.collection("users").document(uid)
-                    .update(updatedProfile)
+                    .update(updatedProfile as Map<String, Any>)
                     .addOnSuccessListener {
                         Toast.makeText(this, "Profile updated", Toast.LENGTH_SHORT).show()
                         finish()
@@ -66,9 +57,8 @@ class EditProfileActivity : AppCompatActivity() {
             }
         }
 
-        // Кнопка отмены
         cancelButton.setOnClickListener {
-            finish() // Просто закрыть экран редактирования
+            finish()
         }
     }
 
@@ -79,11 +69,9 @@ class EditProfileActivity : AppCompatActivity() {
                 if (document.exists()) {
                     val name = document.getString("name") ?: ""
                     val bio = document.getString("bio") ?: ""
-                    val favorites = document.get("favorites") as? List<String> ?: emptyList()
 
                     nameEditText.setText(name)
                     bioEditText.setText(bio)
-                    favoritesEditText.setText(favorites.joinToString(", "))
                 }
             }
             .addOnFailureListener { e ->

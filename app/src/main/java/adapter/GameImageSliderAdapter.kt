@@ -6,6 +6,7 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
+import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.ivanl.gameappandroid.R
 
 class GameImageSliderAdapter(private val images: List<String>) :
@@ -25,6 +26,8 @@ class GameImageSliderAdapter(private val images: List<String>) :
         Glide.with(holder.itemView.context)
             .load(images[position])
             .placeholder(R.drawable.placeholder_image)
+            .error(R.drawable.placeholder_image)
+            .diskCacheStrategy(DiskCacheStrategy.ALL)
             .into(holder.imageView)
     }
 
