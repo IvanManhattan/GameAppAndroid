@@ -39,12 +39,10 @@ class ProfileActivity : AppCompatActivity() {
             loadUserProfile(user.uid)
         }
 
-        // Переход в редактирование профиля
         editProfileButton.setOnClickListener {
             startActivity(Intent(this, EditProfileActivity::class.java))
         }
 
-        // Выход из аккаунта
         logoutButton.setOnClickListener {
             auth.signOut()
             startActivity(Intent(this, MainActivity::class.java))

@@ -5,7 +5,6 @@
     android:orientation="vertical"
     android:padding="16dp">
 
-    <!-- Email пользователя -->
     <TextView
         android:id="@+id/textViewEmail"
         android:layout_width="wrap_content"
@@ -15,7 +14,6 @@
         android:layout_marginBottom="16dp"
         android:layout_marginTop="112dp"/>
 
-    <!-- Имя пользователя -->
     <TextView
         android:id="@+id/textViewName"
         android:layout_width="wrap_content"
@@ -24,7 +22,6 @@
         android:textSize="18sp"
         android:layout_marginBottom="16dp" />
 
-    <!-- Биография пользователя -->
     <TextView
         android:id="@+id/textViewBio"
         android:layout_width="wrap_content"
@@ -33,7 +30,6 @@
         android:textSize="16sp"
         android:layout_marginBottom="16dp" />
 
-    <!-- Список избранных игр -->
     <TextView
         android:id="@+id/textViewFavorites"
         android:layout_width="wrap_content"
@@ -42,7 +38,6 @@
         android:textSize="16sp"
         android:layout_marginBottom="16dp" />
 
-    <!-- Кнопка редактирования профиля -->
     <Button
         android:id="@+id/buttonEditProfile"
         android:layout_width="match_parent"
@@ -51,7 +46,6 @@
         android:textSize="16sp"
         android:layout_marginBottom="16dp" />
 
-    <!-- Кнопка выхода -->
     <Button
         android:id="@+id/profileButtonLogout"
         android:layout_width="match_parent"
